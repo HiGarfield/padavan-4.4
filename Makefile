@@ -34,7 +34,7 @@ toolchain/download:
 	@if [ ! -x $(TOOLCHAIN_GCC) ]; then \
 		echo "Downloading toolchain..."; \
 		tmp_dir="$$(mktemp -d)"; \
-		stage_dir="$(TOOLCHAIN_DIR)/.toolchain-4.4.x.new.$$$$"; \
+		stage_dir="$(TOOLCHAIN_DIR)/.toolchain-staging.$$$$"; \
 		download_ok=0; \
 		attempted_urls=""; \
 		for url in $(TOOLCHAIN_URLS); do \
