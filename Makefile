@@ -34,6 +34,7 @@ toolchain/download:
 	@if [ ! -x $(TOOLCHAIN_GCC) ]; then \
 		echo "Downloading toolchain..."; \
 		tmp_dir="$$(mktemp -d)"; \
+		stage_dir="$(TOOLCHAIN_DIR)/.toolchain-4.4.x.new.$$$$"; \
 		download_ok=0; \
 		attempted_urls=""; \
 		for url in $(TOOLCHAIN_URLS); do \
@@ -44,31 +45,40 @@ toolchain/download:
 			fi; \
 			echo "Trying $$url"; \
 			if curl -fL --retry 3 --retry-delay 2 -o "$$tmp_dir/toolchain.tar.xz" "$$url"; then \
+				rm -rf "$$tmp_dir/extract"; \
 				mkdir -p "$$tmp_dir/extract"; \
 				if tar Jxf "$$tmp_dir/toolchain.tar.xz" -C "$$tmp_dir/extract"; then \
 					toolchain_src="$$tmp_dir/extract"; \
 					if [ ! -x "$$toolchain_src/bin/mipsel-linux-uclibc-gcc" ]; then \
-						candidate_gccs="$$(find "$$tmp_dir/extract" -mindepth 2 -maxdepth 2 -type f -name mipsel-linux-uclibc-gcc)"; \
+						candidate_gccs="$$(find "$$tmp_dir/extract" -type f -path '*/bin/mipsel-linux-uclibc-gcc')"; \
 						candidate_count="$$(printf '%s\n' "$$candidate_gccs" | sed '/^$$/d' | wc -l)"; \
 						candidate_gcc="$$(printf '%s\n' "$$candidate_gccs" | head -n 1)"; \
 						if [ "$$candidate_count" -eq 1 ] && [ -n "$$candidate_gcc" ]; then \
 							toolchain_src="$$(dirname "$$(dirname "$$candidate_gcc")")"; \
 						elif [ "$$candidate_count" -gt 1 ]; then \
-							echo "Skip $$url: multiple toolchain roots found in archive."; \
+							echo "Skip $$url: multiple toolchain roots found in archive, trying next URL."; \
+							continue; \
+						else \
+							echo "Skip $$url: toolchain compiler not found in archive, trying next URL."; \
+							continue; \
 						fi; \
 					fi; \
-					rm -rf $(TOOLCHAIN_ROOT); \
-					mkdir -p $(TOOLCHAIN_ROOT); \
-					cp -a "$$toolchain_src"/. $(TOOLCHAIN_ROOT)/; \
-					if [ -x $(TOOLCHAIN_GCC) ]; then \
-						download_ok=1; \
-						break; \
+					rm -rf "$$stage_dir"; \
+					mkdir -p "$$stage_dir"; \
+					cp -a "$$toolchain_src"/. "$$stage_dir"/; \
+					if [ -x "$$stage_dir/bin/mipsel-linux-uclibc-gcc" ]; then \
+						rm -rf $(TOOLCHAIN_ROOT); \
+						mv "$$stage_dir" $(TOOLCHAIN_ROOT); \
+						if [ -x $(TOOLCHAIN_GCC) ]; then \
+							download_ok=1; \
+							break; \
+						fi; \
 					fi; \
 				fi; \
 			fi; \
 			rm -rf "$$tmp_dir/extract" "$$tmp_dir/toolchain.tar.xz"; \
 		done; \
-		rm -rf "$$tmp_dir"; \
+		rm -rf "$$tmp_dir" "$$stage_dir"; \
 		if [ $$download_ok -ne 1 ]; then \
 			echo "Failed to download a valid toolchain from all configured URLs. Tried: $$attempted_urls"; \
 			exit 1; \
