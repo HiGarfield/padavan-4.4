@@ -35,16 +35,21 @@ toolchain/download:
 		echo "Downloading toolchain..."; \
 		tmp_dir="$$(mktemp -d)"; \
 		download_ok=0; \
+		attempted_urls=""; \
 		for url in $(TOOLCHAIN_URLS); do \
+			attempted_urls="$$attempted_urls $$url"; \
 			echo "Trying $$url"; \
 			if curl -fL --retry 3 --retry-delay 2 -o "$$tmp_dir/toolchain.tar.xz" "$$url"; then \
 				mkdir -p "$$tmp_dir/extract"; \
 				if tar Jxf "$$tmp_dir/toolchain.tar.xz" -C "$$tmp_dir/extract"; then \
 					toolchain_src="$$tmp_dir/extract"; \
 					if [ ! -x "$$toolchain_src/bin/mipsel-linux-uclibc-gcc" ]; then \
-						candidate_src="$$(find "$$tmp_dir/extract" -mindepth 1 -maxdepth 1 -type d | head -n 1)"; \
-						if [ -n "$$candidate_src" ] && [ -x "$$candidate_src/bin/mipsel-linux-uclibc-gcc" ]; then \
-							toolchain_src="$$candidate_src"; \
+						candidate_gcc="$$(find "$$tmp_dir/extract" -mindepth 2 -maxdepth 2 -type f -name mipsel-linux-uclibc-gcc | head -n 1)"; \
+						candidate_count="$$(find "$$tmp_dir/extract" -mindepth 2 -maxdepth 2 -type f -name mipsel-linux-uclibc-gcc | wc -l)"; \
+						if [ "$$candidate_count" -eq 1 ] && [ -n "$$candidate_gcc" ]; then \
+							toolchain_src="$$(dirname "$$(dirname "$$candidate_gcc")")"; \
+						elif [ "$$candidate_count" -gt 1 ]; then \
+							echo "Skip $$url: multiple toolchain roots found in archive."; \
 						fi; \
 					fi; \
 					rm -rf $(TOOLCHAIN_ROOT); \
@@ -60,7 +65,7 @@ toolchain/download:
 		done; \
 		rm -rf "$$tmp_dir"; \
 		if [ $$download_ok -ne 1 ]; then \
-			echo "Failed to download a valid toolchain from all configured URLs."; \
+			echo "Failed to download a valid toolchain from all configured URLs. Tried:$$attempted_urls"; \
 			exit 1; \
 		fi; \
 	fi
