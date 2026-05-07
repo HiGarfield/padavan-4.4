@@ -96,10 +96,10 @@ jobs:
       - name: Start Build
         run: |
           make ${{ matrix.target }}
-          echo "TAG_ANME=$(date +%Y%m%d)" >> $GITHUB_ENV
+          echo "TAG_NAME=$(date +%Y%m%d)" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.target }}-${{ env.TAG_ANME }}
+          name: ${{ matrix.target }}-${{ env.TAG_NAME }}
           path: trunk/images/*.trx
       - uses: ncipollo/release-action@v1
         if: github.event.inputs.release == 'true'
