@@ -327,11 +327,12 @@ unsigned int mape_add_ipv6_hdr(struct sk_buff *skb, struct ipv6hdr mape_ip6h)
 	return 0;
 }
 
-static void fix_skb_packet_type(struct sk_buff *skb, struct ethhdr *eth)
+static void fix_skb_packet_type(struct sk_buff *skb, struct net_device *dev,
+				struct ethhdr *eth)
 {
 	skb->pkt_type = PACKET_HOST;
 	if (unlikely(is_multicast_ether_addr(eth->h_dest))) {
-		if (is_broadcast_ether_addr(eth->h_dest))
+		if (ether_addr_equal_64bits(eth->h_dest, dev->broadcast))
 			skb->pkt_type = PACKET_BROADCAST;
 		else
 			skb->pkt_type = PACKET_MULTICAST;
@@ -392,7 +393,7 @@ unsigned int do_hnat_ext_to_ge2(struct sk_buff *skb, const char *func)
 				return -1;
 		}
 		set_from_extge(skb);
-		fix_skb_packet_type(skb, eth);
+		fix_skb_packet_type(skb, skb->dev, eth);
 		netif_rx(skb);
 		trace_printk("%s: called from %s successfully\n", __func__,
 			     func);
@@ -407,7 +408,7 @@ unsigned int do_hnat_ext_to_ge2(struct sk_buff *skb, const char *func)
 				set_from_mape(skb);
 				skb->vlan_proto = 0;
 				skb->vlan_tci = 0;
-				fix_skb_packet_type(skb, eth_hdr(skb));
+				fix_skb_packet_type(skb, skb->dev, eth_hdr(skb));
 				entry = &hnat_priv->foe_table_cpu[skb_hnat_entry(skb)];
 				entry->bfib1.pkt_type = IPV4_HNAPT;
 				netif_rx(skb);
