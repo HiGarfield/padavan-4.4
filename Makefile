@@ -40,9 +40,16 @@ toolchain/download:
 			if curl -fL --retry 3 --retry-delay 2 -o "$$tmp_dir/toolchain.tar.xz" "$$url"; then \
 				mkdir -p "$$tmp_dir/extract"; \
 				if tar Jxf "$$tmp_dir/toolchain.tar.xz" -C "$$tmp_dir/extract"; then \
+					toolchain_src="$$tmp_dir/extract"; \
+					if [ ! -x "$$toolchain_src/bin/mipsel-linux-uclibc-gcc" ]; then \
+						candidate_src="$$(find "$$tmp_dir/extract" -mindepth 1 -maxdepth 1 -type d | head -n 1)"; \
+						if [ -n "$$candidate_src" ] && [ -x "$$candidate_src/bin/mipsel-linux-uclibc-gcc" ]; then \
+							toolchain_src="$$candidate_src"; \
+						fi; \
+					fi; \
 					rm -rf $(TOOLCHAIN_ROOT); \
 					mkdir -p $(TOOLCHAIN_ROOT); \
-					cp -a "$$tmp_dir/extract"/. $(TOOLCHAIN_ROOT)/; \
+					cp -a "$$toolchain_src"/. $(TOOLCHAIN_ROOT)/; \
 					if [ -x $(TOOLCHAIN_GCC) ]; then \
 						download_ok=1; \
 						break; \
