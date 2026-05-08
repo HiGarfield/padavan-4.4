@@ -84,7 +84,11 @@ static int em_ipset_match(struct sk_buff *skb, struct tcf_ematch *em,
 #else
 #define ACPAR_FAMILY(f)		acpar.family = f
 #endif
+#ifdef HAVE_TC_SKB_PROTOCOL
+	switch (tc_skb_protocol(skb)) {
+#else
 	switch (skb_protocol(skb, true)) {
+#endif
 	case htons(ETH_P_IP):
 		ACPAR_FAMILY(NFPROTO_IPV4);
 		if (!pskb_network_may_pull(skb, sizeof(struct iphdr)))
