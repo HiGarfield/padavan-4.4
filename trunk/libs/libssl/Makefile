@@ -49,7 +49,6 @@ download_test:
 		downloaded=0; \
 		for url in $(SRC_URLS); do \
 			echo "Trying $$url"; \
-			downloaded=0; \
 			if [ "$$dl_cmd" = wget ]; then \
 				wget -t5 --timeout=20 --no-check-certificate -O $(SRC_NAME).tar.gz "$$url" && downloaded=1; \
 			else \
