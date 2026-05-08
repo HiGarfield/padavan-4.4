@@ -1,5 +1,7 @@
 SRC_NAME=openssl-1.1.1w
-SRC_URL=https://www.openssl.org/source/$(SRC_NAME).tar.gz
+SRC_URLS=https://www.openssl.org/source/$(SRC_NAME).tar.gz \
+	https://ftp.openssl.org/source/$(SRC_NAME).tar.gz \
+	https://github.com/openssl/openssl/releases/download/OpenSSL_1_1_1w/$(SRC_NAME).tar.gz
 
 # openssl use CROSS_COMPILE prefix
 CC = gcc
@@ -34,8 +36,16 @@ all: download_test extract_test config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
 
 download_test:
-	( if [ ! -f $(SRC_NAME).tar.gz ]; then \
-		wget -t5 --timeout=20 --no-check-certificate -O $(SRC_NAME).tar.gz $(SRC_URL); \
+	( if [ ! -s $(SRC_NAME).tar.gz ]; then \
+		rm -f $(SRC_NAME).tar.gz; \
+		for url in $(SRC_URLS); do \
+			echo "Trying $$url"; \
+			if curl -fL --retry 5 --retry-delay 2 -o $(SRC_NAME).tar.gz "$$url"; then \
+				break; \
+			fi; \
+			rm -f $(SRC_NAME).tar.gz; \
+		done; \
+		test -s $(SRC_NAME).tar.gz; \
 	fi )
 
 extract_test:
@@ -80,4 +90,3 @@ romfs:
 ifeq ($(CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE),y)
 	$(ROMFSINST) $(SRC_NAME)/apps/openssl /usr/bin/openssl
 endif
-
