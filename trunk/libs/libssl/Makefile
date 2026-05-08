@@ -50,7 +50,7 @@ download_test:
 		for url in $(SRC_URLS); do \
 			echo "Trying $$url"; \
 			if [ "$$dl_cmd" = wget ]; then \
-				wget -t5 --timeout=20 -O $(SRC_NAME).tar.gz "$$url" && downloaded=1; \
+				wget -t5 --timeout=20 --read-timeout=120 -O $(SRC_NAME).tar.gz "$$url" && downloaded=1; \
 			else \
 				curl -fL --connect-timeout 20 --max-time 120 --retry 5 --retry-delay 2 -o $(SRC_NAME).tar.gz "$$url" && downloaded=1; \
 			fi; \
@@ -65,6 +65,7 @@ download_test:
 		fi; \
 		if [ ! -s $(SRC_NAME).tar.gz ]; then \
 			echo "Downloaded $(SRC_NAME).tar.gz is empty." >&2; \
+			exit 1; \
 		fi; \
 		test -s $(SRC_NAME).tar.gz; \
 	fi )
