@@ -5,8 +5,7 @@ THISDIR = $(shell pwd)
 CFLAGS += -ffunction-sections -fdata-sections
 LDFLAGS += -Wl,--gc-sections
 
-#all: download_test extract_test config_test
-all: config_test
+all: download_test extract_test config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
 
 download_test:
@@ -29,7 +28,6 @@ config_test:
 
 configure:
 	( cd $(SRC_NAME) ; \
-	autoreconf -fi ; \
 	PKG_CONFIG_PATH=$(STAGEDIR)/lib/pkgconfig \
 	./configure \
 		--prefix= \

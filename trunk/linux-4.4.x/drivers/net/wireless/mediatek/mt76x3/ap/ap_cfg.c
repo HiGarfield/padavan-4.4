@@ -2331,7 +2331,7 @@ INT RTMPAPSetInformation(
 					}
 					{
 						ap_send_broadcast_deauth(pAd, wdev);
-						if ((&wdev->AuthMode) && (&wdev->WpaMixPairCipher))
+						if (wdev->WepStatus != Ndis802_11EncryptionDisabled)
 							pMbss->CapabilityInfo |= 0x0010;
 						else
 							pMbss->CapabilityInfo &= ~(0x0010);
@@ -17754,5 +17754,4 @@ INT Set_FroamAclHoldTime(
 }
 
 #endif
-
 

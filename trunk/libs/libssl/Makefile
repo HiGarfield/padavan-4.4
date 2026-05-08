@@ -1,5 +1,7 @@
 SRC_NAME=openssl-1.1.1w
-SRC_URL=https://www.openssl.org/source/$(SRC_NAME).tar.gz
+SRC_URLS=https://www.openssl.org/source/$(SRC_NAME).tar.gz \
+	https://ftp.openssl.org/source/$(SRC_NAME).tar.gz \
+	https://github.com/openssl/openssl/releases/download/OpenSSL_1_1_1w/$(SRC_NAME).tar.gz
 
 # openssl use CROSS_COMPILE prefix
 CC = gcc
@@ -34,8 +36,42 @@ all: download_test extract_test config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
 
 download_test:
-	( if [ ! -f $(SRC_NAME).tar.gz ]; then \
-		wget -t5 --timeout=20 --no-check-certificate -O $(SRC_NAME).tar.gz $(SRC_URL); \
+	( if [ ! -s $(SRC_NAME).tar.gz ]; then \
+		rm -f $(SRC_NAME).tar.gz; \
+		if command -v wget >/dev/null 2>&1; then \
+			dl_cmd=wget; \
+		elif command -v curl >/dev/null 2>&1; then \
+			dl_cmd=curl; \
+		else \
+			echo "Cannot download $(SRC_NAME).tar.gz: neither wget nor curl is available." >&2; \
+			exit 1; \
+		fi; \
+		downloaded=0; \
+		for url in $(SRC_URLS); do \
+			echo "Trying $$url"; \
+			if [ "$$dl_cmd" = wget ]; then \
+				if wget -t5 --timeout=20 --read-timeout=120 -O $(SRC_NAME).tar.gz "$$url"; then \
+					downloaded=1; \
+				fi; \
+			else \
+				if curl -fL --connect-timeout 20 --max-time 120 --retry 5 --retry-delay 2 -o $(SRC_NAME).tar.gz "$$url"; then \
+					downloaded=1; \
+				fi; \
+			fi; \
+			if [ $$downloaded -eq 1 ]; then \
+				break; \
+			fi; \
+			rm -f $(SRC_NAME).tar.gz; \
+		done; \
+		if [ $$downloaded -ne 1 ]; then \
+			echo "Failed to download $(SRC_NAME).tar.gz from all configured mirrors." >&2; \
+			exit 1; \
+		fi; \
+		if [ ! -s $(SRC_NAME).tar.gz ]; then \
+			echo "Downloaded $(SRC_NAME).tar.gz is empty." >&2; \
+			exit 1; \
+		fi; \
+		test -s $(SRC_NAME).tar.gz; \
 	fi )
 
 extract_test:
@@ -80,4 +116,3 @@ romfs:
 ifeq ($(CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE),y)
 	$(ROMFSINST) $(SRC_NAME)/apps/openssl /usr/bin/openssl
 endif
-

@@ -254,8 +254,9 @@ INT32 mbss_cr_enable(PNET_DEV pDev)
 	pAd = RTMP_OS_NETDEV_GET_PRIV(pDev);
 	BssId = RT28xx_MBSS_IdxGet(pAd, pDev);
     printk("##### %s, BssId = %d\n", __func__, BssId);
-	if (BssId < 0)
+	if (BssId < 0) {
 		return -1;
+	}
 
     if (pAd->chipCap.hif_type != HIF_MT)
         return 0;
@@ -299,8 +300,9 @@ INT mbss_cr_disable(PNET_DEV pDev)
 
 	pAd = RTMP_OS_NETDEV_GET_PRIV(pDev);
 	BssId = RT28xx_MBSS_IdxGet(pAd, pDev);
-    if (BssId < 0)
+    if (BssId < 0) {
         return -1;
+    }
 
     if (pAd->chipCap.hif_type != HIF_MT)
         return 0;
@@ -357,8 +359,9 @@ INT32 MBSS_Open(PNET_DEV pDev)
 	u4MaxMBSSIDSize = sizeof(pAd->ApCfg.MBSSID)/sizeof(pAd->ApCfg.MBSSID[0]);
 	pAd = RTMP_OS_NETDEV_GET_PRIV(pDev);
 	BssId = RT28xx_MBSS_IdxGet(pAd, pDev);
-	if (BssId < 0)
+	if (BssId < 0) {
 		return -1;
+	}
 
 	if(BssId >= u4MaxMBSSIDSize)
 	{
@@ -414,8 +417,9 @@ INT MBSS_Close(PNET_DEV pDev)
 	UINT32 u4MaxMBSSIDSize;
 	pAd = RTMP_OS_NETDEV_GET_PRIV(pDev);
 	BssId = RT28xx_MBSS_IdxGet(pAd, pDev);
-    if (BssId < 0)
+    if (BssId < 0) {
         return -1;
+    }
 
 	RTMP_OS_NETDEV_STOP_QUEUE(pDev);
 
@@ -451,4 +455,3 @@ INT MBSS_Close(PNET_DEV pDev)
 }
 
 #endif /* MBSS_SUPPORT */
-

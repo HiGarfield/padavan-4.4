@@ -23,8 +23,7 @@ config_test:
 
 configure:
 	( cd $(SRC_NAME) ; \
-	./autogen.sh -fi ; \
-	./configure \
+	./autogen.sh \
 		--prefix=$(STAGEDIR) \
 		--enable-static \
 		--disable-shared \
@@ -71,4 +70,3 @@ install:
 	$(MAKE) -C $(SRC_NAME) install DESTDIR=""
 
 romfs:
-

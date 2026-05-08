@@ -845,7 +845,15 @@ INT show_ed_cnt_for_channel_quality(RTMP_ADAPTER *pAd, PSTRING arg);
 #ifdef LED_CONTROL_SUPPORT
 INT Set_Led_Proc(
         IN RTMP_ADAPTER *pAd,
-        IN PSTRING arg);
+        IN PSTRING arg)
+{
+	UCHAR val = simple_strtol(arg, 0, 10);
+
+	DBGPRINT(RT_DEBUG_OFF, ("Set_Led_Proc::(Led=%d)\n", val));
+	RTMPSetLED(pAd, val);
+
+	return TRUE;
+}
 #endif /* LED_CONTROL_SUPPORT */
 #endif /* RTMP_MAC_PCI */
 
@@ -13246,22 +13254,6 @@ INT	Set_WscStatus_Proc(
 	DBGPRINT(RT_DEBUG_TRACE, ("IF(ra%d) Set_WscStatus_Proc::(WscStatus=%d)\n", apidx, pAd->ApCfg.MBSSID[apidx].WscControl.WscStatus));
 	return TRUE;
 }
-
-#ifdef RTMP_MAC_PCI
-#ifdef LED_CONTROL_SUPPORT
-INT     Set_Led_Proc(
-        IN      PRTMP_ADAPTER   pAd,
-        IN      PSTRING                 arg)
-{
- 
-        UCHAR val = simple_strtol(arg, 0, 10);
-        DBGPRINT(RT_DEBUG_OFF, ("Set_Led_Proc::(Led=%d)\n", val));
-        RTMPSetLED(pAd, val);
- 
-        return TRUE;
-}
-#endif /* LED_CONTROL_SUPPORT */
-#endif /* RTMP_MAC_PCI */
 
 #define WSC_GET_CONF_MODE_EAP	1
 #define WSC_GET_CONF_MODE_UPNP	2
