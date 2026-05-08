@@ -38,20 +38,18 @@ all: download_test extract_test config_test
 download_test:
 	( if [ ! -s $(SRC_NAME).tar.gz ]; then \
 		rm -f $(SRC_NAME).tar.gz; \
+		if command -v wget >/dev/null 2>&1; then \
+			dl_cmd='wget -t5 --timeout=20 --no-check-certificate -O $(SRC_NAME).tar.gz'; \
+		elif command -v curl >/dev/null 2>&1; then \
+			dl_cmd='curl -fL --connect-timeout 20 --max-time 120 --retry 5 --retry-delay 2 -o $(SRC_NAME).tar.gz'; \
+		else \
+			echo "Failed to download $(SRC_NAME).tar.gz: neither wget nor curl is available." >&2; \
+			exit 1; \
+		fi; \
 		downloaded=0; \
 		for url in $(SRC_URLS); do \
 			echo "Trying $$url"; \
-			if command -v wget >/dev/null 2>&1; then \
-				wget -t5 --timeout=20 --no-check-certificate -O $(SRC_NAME).tar.gz "$$url" && downloaded=1 && break; \
-			elif command -v curl >/dev/null 2>&1; then \
-				curl -fL --connect-timeout 20 --max-time 120 --retry 5 --retry-delay 2 -o $(SRC_NAME).tar.gz "$$url" && downloaded=1 && break; \
-			else \
-				echo "Failed to download $(SRC_NAME).tar.gz: neither wget nor curl is available." >&2; \
-				exit 1; \
-			fi; \
-			if [ $$downloaded -eq 1 ]; then \
-				break; \
-			fi; \
+			sh -c "$$dl_cmd \"$$url\"" && downloaded=1 && break; \
 			rm -f $(SRC_NAME).tar.gz; \
 		done; \
 		if [ $$downloaded -ne 1 ] || [ ! -s $(SRC_NAME).tar.gz ]; then \
