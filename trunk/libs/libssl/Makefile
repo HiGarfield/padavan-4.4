@@ -43,14 +43,14 @@ download_test:
 		elif command -v curl >/dev/null 2>&1; then \
 			dl_cmd=curl; \
 		else \
-			echo "Failed to download $(SRC_NAME).tar.gz: neither wget nor curl is available." >&2; \
+			echo "Cannot download $(SRC_NAME).tar.gz: neither wget nor curl is available." >&2; \
 			exit 1; \
 		fi; \
 		downloaded=0; \
 		for url in $(SRC_URLS); do \
 			echo "Trying $$url"; \
 			if [ "$$dl_cmd" = wget ]; then \
-				wget -t5 --timeout=20 --no-check-certificate -O $(SRC_NAME).tar.gz "$$url" && downloaded=1; \
+				wget -t5 --timeout=20 -O $(SRC_NAME).tar.gz "$$url" && downloaded=1; \
 			else \
 				curl -fL --connect-timeout 20 --max-time 120 --retry 5 --retry-delay 2 -o $(SRC_NAME).tar.gz "$$url" && downloaded=1; \
 			fi; \
@@ -59,8 +59,12 @@ download_test:
 			fi; \
 			rm -f $(SRC_NAME).tar.gz; \
 		done; \
-		if [ $$downloaded -ne 1 ] || [ ! -s $(SRC_NAME).tar.gz ]; then \
+		if [ $$downloaded -ne 1 ]; then \
 			echo "Failed to download $(SRC_NAME).tar.gz from all configured mirrors." >&2; \
+			exit 1; \
+		fi; \
+		if [ ! -s $(SRC_NAME).tar.gz ]; then \
+			echo "Downloaded $(SRC_NAME).tar.gz is empty." >&2; \
 		fi; \
 		test -s $(SRC_NAME).tar.gz; \
 	fi )
