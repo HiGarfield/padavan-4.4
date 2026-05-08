@@ -45,6 +45,9 @@ download_test:
 			fi; \
 			rm -f $(SRC_NAME).tar.gz; \
 		done; \
+		if [ ! -s $(SRC_NAME).tar.gz ]; then \
+			echo "Failed to download $(SRC_NAME).tar.gz from all configured mirrors." >&2; \
+		fi; \
 		test -s $(SRC_NAME).tar.gz; \
 	fi )
 
