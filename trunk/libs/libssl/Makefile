@@ -50,9 +50,13 @@ download_test:
 		for url in $(SRC_URLS); do \
 			echo "Trying $$url"; \
 			if [ "$$dl_cmd" = wget ]; then \
-				wget -t5 --timeout=20 --read-timeout=120 -O $(SRC_NAME).tar.gz "$$url" && downloaded=1; \
+				if wget -t5 --timeout=20 --read-timeout=120 -O $(SRC_NAME).tar.gz "$$url"; then \
+					downloaded=1; \
+				fi; \
 			else \
-				curl -fL --connect-timeout 20 --max-time 120 --retry 5 --retry-delay 2 -o $(SRC_NAME).tar.gz "$$url" && downloaded=1; \
+				if curl -fL --connect-timeout 20 --max-time 120 --retry 5 --retry-delay 2 -o $(SRC_NAME).tar.gz "$$url"; then \
+					downloaded=1; \
+				fi; \
 			fi; \
 			if [ $$downloaded -eq 1 ]; then \
 				break; \
