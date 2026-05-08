@@ -62,7 +62,7 @@ nvram_restore_defaults(void)
 	char lan_mac[] = "FFFF";
 
 	int i_offset = get_wired_mac_e2p_offset(0) + 4;
-	if (flash_mtd_read(MTD_PART_NAME_FACTORY, i_offset, buffer, 2) == 0) {
+	if (flash_mtd_read(MTD_PART_NAME_WIRED_MAC, i_offset, buffer, 2) == 0) {
 		sprintf(lan_mac, "%02X%02X", buffer[0] & 0xff, buffer[1] & 0xff);
 	}
 
