@@ -38,14 +38,23 @@ all: download_test extract_test config_test
 download_test:
 	( if [ ! -s $(SRC_NAME).tar.gz ]; then \
 		rm -f $(SRC_NAME).tar.gz; \
+		downloaded=0; \
 		for url in $(SRC_URLS); do \
 			echo "Trying $$url"; \
-			if curl -fL --retry 5 --retry-delay 2 -o $(SRC_NAME).tar.gz "$$url"; then \
+			if command -v wget >/dev/null 2>&1; then \
+				wget -t5 --timeout=20 --no-check-certificate -O $(SRC_NAME).tar.gz "$$url" && downloaded=1 && break; \
+			elif command -v curl >/dev/null 2>&1; then \
+				curl -fL --connect-timeout 20 --max-time 120 --retry 5 --retry-delay 2 -o $(SRC_NAME).tar.gz "$$url" && downloaded=1 && break; \
+			else \
+				echo "Failed to download $(SRC_NAME).tar.gz: neither wget nor curl is available." >&2; \
+				exit 1; \
+			fi; \
+			if [ $$downloaded -eq 1 ]; then \
 				break; \
 			fi; \
 			rm -f $(SRC_NAME).tar.gz; \
 		done; \
-		if [ ! -s $(SRC_NAME).tar.gz ]; then \
+		if [ $$downloaded -ne 1 ] || [ ! -s $(SRC_NAME).tar.gz ]; then \
 			echo "Failed to download $(SRC_NAME).tar.gz from all configured mirrors." >&2; \
 		fi; \
 		test -s $(SRC_NAME).tar.gz; \
