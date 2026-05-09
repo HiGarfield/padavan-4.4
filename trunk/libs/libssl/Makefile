@@ -1,5 +1,6 @@
 SRC_NAME=openssl-1.1.1w
 SRC_URLS=https://www.openssl.org/source/$(SRC_NAME).tar.gz \
+	https://www.openssl.org/source/old/1.1.1/$(SRC_NAME).tar.gz \
 	https://ftp.openssl.org/source/$(SRC_NAME).tar.gz \
 	https://github.com/openssl/openssl/releases/download/OpenSSL_1_1_1w/$(SRC_NAME).tar.gz
 
@@ -50,11 +51,11 @@ download_test:
 		for url in $(SRC_URLS); do \
 			echo "Trying $$url"; \
 			if [ "$$dl_cmd" = wget ]; then \
-				if wget -t5 --timeout=20 --read-timeout=120 -O $(SRC_NAME).tar.gz "$$url"; then \
+				if wget -t15 --waitretry=2 --retry-connrefused --timeout=30 --read-timeout=180 -O $(SRC_NAME).tar.gz "$$url"; then \
 					downloaded=1; \
 				fi; \
 			else \
-				if curl -fL --connect-timeout 20 --max-time 120 --retry 5 --retry-delay 2 -o $(SRC_NAME).tar.gz "$$url"; then \
+				if curl -fL --connect-timeout 30 --max-time 180 --retry 8 --retry-delay 2 --retry-all-errors -o $(SRC_NAME).tar.gz "$$url"; then \
 					downloaded=1; \
 				fi; \
 			fi; \

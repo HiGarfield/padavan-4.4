@@ -233,17 +233,9 @@ typedef struct _PAIR_CHANNEL_FREQ_ENTRY
 #define MTD_PART_NAME_FACTORY	"Factory"
 #define MTD_PART_NAME_KERNEL	"kernel"
 #define MTD_PART_NAME_RWFS	"RWFS"
-#if defined (BOARD_A3004NS_DUAL)
-#define MTD_PART_NAME_WIRED_MAC	"Bootloader"
-#define WIRED_MAC_IS_READONLY	1
-#else
 #define MTD_PART_NAME_WIRED_MAC	MTD_PART_NAME_FACTORY
-#endif
 
-#if defined (BOARD_A3004NS_DUAL)
-#define OFFSET_MAC_GMAC0	0x1FC20
-#define OFFSET_MAC_GMAC2	0x1FC40
-#elif defined (BOARD_WE410443_TC)
+#if defined (BOARD_WE410443_TC)
 #define OFFSET_MAC_GMAC0 	0xFFF0
 #define OFFSET_MAC_GMAC2 	0xFFF6
 #elif defined (BOARD_360P2)
