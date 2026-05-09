@@ -90,6 +90,10 @@
 	};
 };
 
+&raeth {
+	wan_at = "p0";
+};
+
 &pcie {
 	status = "okay";
 };

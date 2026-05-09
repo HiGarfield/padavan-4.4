@@ -582,7 +582,11 @@ gen_ralink_config(int is_soc_ap, int is_aband, int disable_autoscan)
 	i_channel_max = 13;
 
 	if (is_soc_ap) {
+#if defined(USE_MT76X2_AP)
+		dat_file = "/etc/Wireless/RT2860/RT2860.dat";
+#else
 		dat_file = "/etc/Wireless/RT2860/RT2860AP.dat";
+#endif
 		sku_file = "/etc/Wireless/RT2860/SingleSKU.dat";
 	} else {
 		dat_file = "/etc/Wireless/iNIC/iNIC_ap.dat";
