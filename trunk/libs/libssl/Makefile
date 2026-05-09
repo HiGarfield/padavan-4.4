@@ -51,7 +51,7 @@ download_test:
 		for url in $(SRC_URLS); do \
 			echo "Trying $$url"; \
 			if [ "$$dl_cmd" = wget ]; then \
-				if wget -t15 --waitretry=2 --retry-connrefused --timeout=30 --read-timeout=180 -O $(SRC_NAME).tar.gz "$$url"; then \
+				if wget -t8 --waitretry=2 --retry-connrefused --timeout=30 --read-timeout=180 -O $(SRC_NAME).tar.gz "$$url"; then \
 					downloaded=1; \
 				fi; \
 			else \

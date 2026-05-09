@@ -90,6 +90,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '^1.19.2'
+          # Disable setup-go cache to avoid frequent cache API restore/save errors in this workflow.
           cache: false
       - name: Prepare environment
         run: |
