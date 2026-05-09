@@ -114,8 +114,6 @@ jobs:
             trunk/user/**/*.tar.bz2
             trunk/user/**/*.zip
           key: sources-${{ hashFiles('trunk/libs/*/Makefile', 'trunk/user/*/Makefile') }}
-          restore-keys: |
-            sources-
       - name: Cache Go modules and build cache
         uses: actions/cache@v4
         with:
