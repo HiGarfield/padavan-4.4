@@ -11,21 +11,22 @@ config_xz:
 	fi )
 
 configure_xz:
-	( cd $(SRC_NAME2) ; \
-	./autogen.sh ; \
+	( cd $(SRC_NAME2) && \
 	./configure \
 		--disable-doc \
+		--disable-nls \
 		--disable-shared \
 		--disable-werror \
 		--disable-xz \
 		--disable-xzdec \
 		--disable-lzmadec \
 		--disable-lzmainfo \
-		CFLAGS="-std=c99" ; \
-	)
+		CFLAGS="-std=c99" && \
+	touch aclocal.m4 )
 
 build_xz:
-	make -j$(HOST_NCPU) -C $(SRC_NAME2)
+	make -j$(HOST_NCPU) -C $(SRC_NAME2) \
+		AUTOMAKE=: ACLOCAL=: AUTOCONF=: AUTOHEADER=:
 
 build_squashfs:
 	make -j$(HOST_NCPU) -C $(SRC_NAME1) XZUTILSDIR=$(shell pwd)/$(SRC_NAME2) ; \

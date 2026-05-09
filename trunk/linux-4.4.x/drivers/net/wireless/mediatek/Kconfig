@@ -19,6 +19,9 @@ choice
 	config FIRST_IF_NONE
 	bool "None"
 	
+	config FIRST_IF_MT7602E
+	bool "MT7602E"
+
 	config FIRST_IF_MT7603E
 	bool "MT7603E"
 
@@ -75,6 +78,7 @@ endchoice
 config RT_FIRST_CARD
 	int
 	depends on !FIRST_IF_NONE
+	default 7602 if FIRST_IF_MT7602E
 	default 7603 if FIRST_IF_MT7603E	
 	default 7615 if FIRST_IF_MT7615E
 	default 7622 if FIRST_IF_MT7622
