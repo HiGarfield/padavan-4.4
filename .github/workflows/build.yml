@@ -96,6 +96,42 @@ jobs:
         run: |
           sudo apt update
           sudo apt install libtool-bin libltdl-dev gperf python3-docutils autopoint gettext ccache
+      - name: Cache toolchain
+        uses: actions/cache@v4
+        with:
+          path: toolchain-mipsel/toolchain-4.4.x
+          key: toolchain-${{ hashFiles('Makefile') }}
+      - name: Cache source archives
+        uses: actions/cache@v4
+        with:
+          path: |
+            trunk/libs/**/*.tar.gz
+            trunk/libs/**/*.tar.xz
+            trunk/libs/**/*.tar.bz2
+            trunk/libs/**/*.zip
+            trunk/user/**/*.tar.gz
+            trunk/user/**/*.tar.xz
+            trunk/user/**/*.tar.bz2
+            trunk/user/**/*.zip
+          key: sources-${{ hashFiles('trunk/libs/*/Makefile', 'trunk/user/*/Makefile') }}
+          restore-keys: |
+            sources-
+      - name: Cache Go modules and build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: go-${{ hashFiles('trunk/user/adguardhome/Makefile', 'trunk/user/v2ray/Makefile', 'trunk/user/xray/Makefile') }}
+          restore-keys: |
+            go-
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ccache-${{ matrix.target }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ matrix.target }}-
       - name: Start Build
         run: |
           make ${{ matrix.target }}
