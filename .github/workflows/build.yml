@@ -86,8 +86,8 @@ jobs:
       matrix:
         target: ${{ fromJson(needs.setup.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version: '^1.19.2'
           # Disable setup-go cache to avoid frequent cache API restore/save errors in this workflow.
@@ -97,12 +97,12 @@ jobs:
           sudo apt update
           sudo apt install libtool-bin libltdl-dev gperf python3-docutils autopoint gettext ccache
       - name: Cache toolchain
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: toolchain-mipsel/toolchain-4.4.x
           key: toolchain-${{ hashFiles('Makefile') }}
       - name: Cache source archives
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             trunk/libs/**/*.tar.gz
@@ -115,7 +115,7 @@ jobs:
             trunk/user/**/*.zip
           key: sources-${{ hashFiles('trunk/libs/*/Makefile', 'trunk/user/*/Makefile') }}
       - name: Cache Go modules and build cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/go/pkg/mod
@@ -124,7 +124,7 @@ jobs:
           restore-keys: |
             go-
       - name: Cache ccache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.ccache
           key: ccache-${{ matrix.target }}-${{ github.sha }}
@@ -134,7 +134,7 @@ jobs:
         run: |
           make ${{ matrix.target }}
           echo "TAG_NAME=$(date +%Y%m%d)" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.target }}-${{ env.TAG_NAME }}
           path: trunk/images/*.trx
@@ -146,7 +146,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4.1.3
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
       - name: Verify firmware artifacts
@@ -160,7 +160,7 @@ jobs:
             cp "$fw" release-artifacts/
           done < /tmp/firmware-artifacts.txt
           ls -lh release-artifacts
-      - uses: ncipollo/release-action@v1
+      - uses: ncipollo/release-action@v1.21.0
         with:
           commit: ${{ github.sha }}
           tag: Padavan
