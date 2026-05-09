@@ -118,10 +118,17 @@ jobs:
         run: |
           find artifacts -type f -name "*.trx" | tee /tmp/firmware-artifacts.txt
           test -s /tmp/firmware-artifacts.txt
+      - name: Collect release artifacts
+        run: |
+          mkdir -p release-artifacts
+          while IFS= read -r fw; do
+            cp "$fw" release-artifacts/
+          done < /tmp/firmware-artifacts.txt
+          ls -lh release-artifacts
       - uses: ncipollo/release-action@v1
         with:
           commit: ${{ github.sha }}
           tag: Padavan
-          artifacts: artifacts/**/*.trx
+          artifacts: release-artifacts/*.trx
           allowUpdates: true
           replacesArtifacts: true
