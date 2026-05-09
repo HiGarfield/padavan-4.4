@@ -1,7 +1,7 @@
 name: build
 
 permissions:
-  contents: write
+  contents: read
 
 on: 
 #  push:
@@ -76,6 +76,8 @@ jobs:
     needs: setup
     name: ${{ matrix.target }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:

@@ -175,8 +175,10 @@ get_eeprom_params(void)
 		if (ether_atoe(macaddr_wl, ea)) {
 			memcpy(buffer, ea, ETHER_ADDR_LEN);
 			strcpy(macaddr_lan, macaddr_wl);
+#if !defined(WIRED_MAC_IS_READONLY)
 			if (i_ret >= 0)
 				flash_mtd_write(MTD_PART_NAME_WIRED_MAC, i_offset, ea, ETHER_ADDR_LEN);
+#endif
 		}
 	} else {
 		ether_etoa(buffer, macaddr_lan);
@@ -201,7 +203,7 @@ get_eeprom_params(void)
 			memcpy(buffer, buffer+ETHER_ADDR_LEN, ETHER_ADDR_LEN);
 			buffer[5] |= 0x03;
 			ether_etoa(buffer, macaddr_wan);
-#if !defined (USE_SINGLE_MAC)
+#if !defined (USE_SINGLE_MAC) && !defined (WIRED_MAC_IS_READONLY)
 			if (i_ret >= 0)
 				flash_mtd_write(MTD_PART_NAME_WIRED_MAC, i_offset, buffer, ETHER_ADDR_LEN);
 #endif

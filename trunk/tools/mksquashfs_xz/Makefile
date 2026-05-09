@@ -11,7 +11,7 @@ config_xz:
 	fi )
 
 configure_xz:
-	( cd $(SRC_NAME2) ; \
+	( cd $(SRC_NAME2) && \
 	./configure \
 		--disable-doc \
 		--disable-nls \
@@ -21,8 +21,8 @@ configure_xz:
 		--disable-xzdec \
 		--disable-lzmadec \
 		--disable-lzmainfo \
-		CFLAGS="-std=c99" ; \
-	touch aclocal.m4 ; \
+		CFLAGS="-std=c99" && \
+	touch aclocal.m4 \
 	)
 
 build_xz:

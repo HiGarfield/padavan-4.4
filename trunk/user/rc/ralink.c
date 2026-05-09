@@ -221,6 +221,10 @@ set_wired_mac(int is_wan, const char *mac)
 
 	if (ether_atoe(mac, ea)) {
 		i_offset = get_wired_mac_e2p_offset(is_wan);
+#if defined(WIRED_MAC_IS_READONLY)
+		puts("MAC write is not supported on this device!");
+		return -1;
+#else
 		if (flash_mtd_write(MTD_PART_NAME_WIRED_MAC, i_offset, ea, ETHER_ADDR_LEN) == 0) {
 			if (get_wired_mac(is_wan) == 0)
 				puts("\nPlease reboot router!");
@@ -228,6 +232,7 @@ set_wired_mac(int is_wan, const char *mac)
 			puts("Write MAC to EEPROM FAILED!");
 			return -1;
 		}
+#endif
 	} else {
 		printf("MAC [%s] is not valid MAC address!\n", mac);
 		return EINVAL;

@@ -235,6 +235,7 @@ typedef struct _PAIR_CHANNEL_FREQ_ENTRY
 #define MTD_PART_NAME_RWFS	"RWFS"
 #if defined (BOARD_A3004NS_DUAL)
 #define MTD_PART_NAME_WIRED_MAC	"Bootloader"
+#define WIRED_MAC_IS_READONLY	1
 #else
 #define MTD_PART_NAME_WIRED_MAC	MTD_PART_NAME_FACTORY
 #endif
