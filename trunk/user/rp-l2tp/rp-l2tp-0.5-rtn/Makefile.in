@@ -33,7 +33,7 @@ EXTRA_LIBS=@LIBEVENT@/*.o -ldl
 SRCS=$(OBJS:.o=.c)
 CFLAGS=@CFLAGS@ -I.. -I@LIBEVENT@ -Wall -Wstrict-prototypes -ansi -pedantic -D_GNU_SOURCE -DVERSION=\"$(VERSION)\" -DPREFIX=\"$(prefix)\" -DSYSCONFDIR=\"$(sysconfdir)\"
 
-TARGETS=l2tpd libl2tp.a handlers
+TARGETS=l2tpd libl2tp.a
 
 all: $(TARGETS)
 
@@ -42,8 +42,7 @@ libl2tp.a: $(OBJS)
 	@AR@ -rc $@ $^
 	@RANLIB@ $@ || true
 
-l2tpd: libl2tp.a libevent/libevent.a
-	$(MAKE) -C handlers
+l2tpd: libl2tp.a libevent/libevent.a handlers
 	@CC@ -o l2tpd -rdynamic $(OBJS) $(EXTRA_LIBS)
 
 libevent/libevent.a:
