@@ -22,8 +22,7 @@ configure_xz:
 		--disable-lzmadec \
 		--disable-lzmainfo \
 		CFLAGS="-std=c99" && \
-	touch aclocal.m4 \
-	)
+	touch aclocal.m4 )
 
 build_xz:
 	make -j$(HOST_NCPU) -C $(SRC_NAME2) \
