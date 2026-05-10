@@ -147,7 +147,18 @@ VOID get_dev_config_idx(RTMP_ADAPTER *pAd)
 //		pAd->flash_offset = SECOND_RF_OFFSET;
 	if (IS_RT6352(pAd)) 
 		idx = 0;
-	else if ((first_card == second_card) || IS_MT76x2(pAd)) {
+	else if (IS_MT76x2(pAd)) {
+		if ((IS_MT7602(pAd) && first_card == 0x7602) ||
+		    (IS_MT7612(pAd) && first_card == 0x7612)) {
+			idx = 0;
+		} else if ((IS_MT7602(pAd) && second_card == 0x7602) ||
+			   (IS_MT7612(pAd) && second_card == 0x7612)) {
+			idx = 1;
+		} else {
+			idx = probe_cnt;
+			probe_cnt--;
+		}
+	} else if (first_card == second_card) {
 		idx = probe_cnt;
 		probe_cnt--;
 	} else {
